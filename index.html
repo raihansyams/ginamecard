@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Status Joki Live</title>
+<title>Kokobear — Status Joki Live</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&family=Spectral:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -90,11 +90,20 @@
     padding:11px 12px; border-radius:6px; letter-spacing:0.03em;
   }
   input#uid:focus{ outline:2px solid var(--gilt); outline-offset:1px; border-color:var(--gilt); }
-  input#uid::placeholder{ color:#565b70; }
+  input#uid::placeholder, input#joki-name::placeholder, input#gacha-target::placeholder{ color:#565b70; }
+
+  input#joki-name, input#gacha-target{
+    width:100%; background:var(--ink); border:1px solid var(--line);
+    color:var(--parchment); font-family:var(--font-ui); font-size:14px;
+    padding:11px 12px; border-radius:6px;
+  }
+  input#joki-name:focus, input#gacha-target:focus{
+    outline:2px solid var(--gilt); outline-offset:1px; border-color:var(--gilt);
+  }
 
   .field{ margin-bottom:16px; }
 
-  .segmented{ display:flex; gap:8px; }
+  .segmented{ display:flex; gap:8px; flex-wrap:wrap; }
   .seg-btn{
     flex:1; background:var(--ink); border:1px solid var(--line);
     color:var(--muted); font-family:var(--font-ui); font-weight:600; font-size:12.5px;
@@ -108,6 +117,13 @@
   .seg-btn[data-cat="spiral"][aria-pressed="true"]{ background:var(--spiral); }
   .seg-btn[data-cat="so"][aria-pressed="true"]{ background:var(--so); }
   .seg-btn[data-cat="it"][aria-pressed="true"]{ background:var(--it); }
+  .seg-btn[data-cat="gacha"][aria-pressed="true"]{ background:var(--gilt); }
+
+  .field-hint{
+    margin-top:6px; font-size:10.5px; color:var(--muted); line-height:1.4;
+  }
+  #gacha-field{ display:none; }
+  #gacha-field.show{ display:block; }
 
   button#submit-btn{
     width:100%; margin-top:6px; background:var(--gilt); color:#241a08;
@@ -233,8 +249,8 @@
 
   <header class="top">
     <div class="brand">
-      <span class="mark">Status Joki</span>
-      <h1>Live GI Namecard</h1>
+      <span class="mark">Kokobear</span>
+      <h1>Status Joki — Live Namecard</h1>
     </div>
     <p>Ambil nickname, foto profil &amp; namecard dari UID Genshin Impact secara langsung.</p>
   </header>
@@ -245,19 +261,34 @@
       <p class="zone-label">Panel Kontrol</p>
       <p class="zone-hint">Bagian ini untuk kamu isi. Kalau kamu window-capture halaman ini di OBS, panel ini juga akan kelihatan — lihat tips di bawah kalau mau menyembunyikannya dari penonton.</p>
 
-      <form id="card-form">      
+      <form id="card-form">
         <div class="field">
-          <label class="field-label" for="uid">UID Genshin Impact</label>
-          <input id="uid" name="uid" type="text" inputmode="numeric" autocomplete="off"placeholder="Contoh: 618285856" maxlength="10">
+          <label class="field-label" for="joki-name">Nama Joki</label>
+          <input id="joki-name" name="jokiName" type="text" autocomplete="off"
+                 placeholder="Contoh: Kokobear" maxlength="40">
         </div>
 
         <div class="field">
-          <label class="field-label">Jenis Joki</label>
-          <div class="segmented" id="category-group" role="radiogroup" aria-label="Jenis joki">
-            <button type="button" class="seg-btn" data-cat="spiral" role="radio" aria-checked="true" aria-pressed="true">SPIRAL</button>
-            <button type="button" class="seg-btn" data-cat="so" role="radio" aria-checked="false" aria-pressed="false">SO</button>
-            <button type="button" class="seg-btn" data-cat="it" role="radio" aria-checked="false" aria-pressed="false">IT</button>
+          <label class="field-label" for="uid">UID Genshin Impact</label>
+          <input id="uid" name="uid" type="text" inputmode="numeric" autocomplete="off"
+                 placeholder="Contoh: 618285856" maxlength="10">
+        </div>
+
+        <div class="field">
+          <label class="field-label">Jenis Joki <span style="color:var(--gilt);">(bisa pilih lebih dari satu)</span></label>
+          <div class="segmented" id="category-group" role="group" aria-label="Jenis joki">
+            <button type="button" class="seg-btn" data-cat="spiral" aria-pressed="false">SPIRAL</button>
+            <button type="button" class="seg-btn" data-cat="so" aria-pressed="false">SO</button>
+            <button type="button" class="seg-btn" data-cat="it" aria-pressed="false">IT</button>
+            <button type="button" class="seg-btn" data-cat="gacha" aria-pressed="false">GACHA</button>
           </div>
+          <div class="field-hint">Pilih semua layanan yang sedang dikerjakan.</div>
+        </div>
+
+        <div class="field" id="gacha-field">
+          <label class="field-label" for="gacha-target">Karakter / Weapon yang Akan Digacha</label>
+          <input id="gacha-target" name="gachaTarget" type="text" autocomplete="off"
+                 placeholder="Contoh: Columbina / Signature Weapon" maxlength="80">
         </div>
 
         <button type="submit" id="submit-btn">Tampilkan Namecard</button>
@@ -282,7 +313,7 @@
       <div id="card-wrap">
         <div class="empty-state" id="empty-state">
           <div class="glyph">✦</div>
-          <p>Masukkan UID dan pilih jenis joki di panel kontrol, lalu tekan <b>Tampilkan Namecard</b> atau Enter.</p>
+          <p>Masukkan nama joki, UID, dan pilih satu atau beberapa jenis joki, lalu tekan <b>Tampilkan Namecard</b> atau Enter.</p>
         </div>
 
         <div class="card-bg" id="card-bg"></div>
@@ -300,6 +331,7 @@
           <div class="avatar-ring" id="avatar-ring"></div>
           <div class="name-block">
             <p class="nickname" id="nickname"></p>
+            <div id="joki-name-display" style="margin-top:2px;font-size:11px;color:var(--gilt-bright);font-weight:600;"></div>
             <div class="meta-line">
               <span id="ar-badge"></span>
               <span class="sep">·</span>
@@ -320,19 +352,23 @@ const AVATAR_ICONS = {"10000002":"UI_AvatarIcon_Ayaka","10000003":"UI_AvatarIcon
 const NAMECARD_ICONS = {"210001":"UI_NameCardPic_0_P","210002":"UI_NameCardPic_Bp1_P","210003":"UI_NameCardPic_Ambor_P","210004":"UI_NameCardPic_Klee_P","210005":"UI_NameCardPic_Diluc_P","210006":"UI_NameCardPic_Razor_P","210007":"UI_NameCardPic_Venti_P","210008":"UI_NameCardPic_Qin_P","210009":"UI_NameCardPic_Barbara_P","210010":"UI_NameCardPic_Kaeya_P","210011":"UI_NameCardPic_Lisa_P","210012":"UI_NameCardPic_Sucrose_P","210013":"UI_NameCardPic_Fischl_P","210014":"UI_NameCardPic_Noel_P","210015":"UI_NameCardPic_Mona_P","210016":"UI_NameCardPic_Bennett_P","210017":"UI_NameCardPic_Xiangling_P","210018":"UI_NameCardPic_Xingqiu_P","210019":"UI_NameCardPic_Qiqi_P","210020":"UI_NameCardPic_Keqing_P","210021":"UI_NameCardPic_Csxy1_P","210022":"UI_NameCardPic_Mxsy_P","210023":"UI_NameCardPic_Yxzl_P","210024":"UI_NameCardPic_Md_P","210025":"UI_NameCardPic_Ly_P","210026":"UI_NameCardPic_Yszj_P","210027":"UI_NameCardPic_Sss_P","210028":"UI_NameCardPic_Tzz1_P","210029":"UI_NameCardPic_Sj1_P","210030":"UI_NameCardPic_Olah1_P","210031":"UI_NameCardPic_Zdg1_P","210032":"UI_NameCardPic_Lyws1_P","210033":"UI_NameCardPic_Ysxf1_P","210038":"UI_NameCardPic_Ningguang_P","210039":"UI_NameCardPic_Beidou_P","210040":"UI_NameCardPic_Chongyun_P","210041":"UI_NameCardPic_Tzz2_P","210042":"UI_NameCardPic_Bp2_P","210043":"UI_NameCardPic_Diona_P","210044":"UI_NameCardPic_Zhongli_P","210045":"UI_NameCardPic_Xinyan_P","210046":"UI_NameCardPic_Tartaglia_P","210047":"UI_NameCardPic_Md2_P","210048":"UI_NameCardPic_Md1_P","210049":"UI_NameCardPic_Ly1_P","210050":"UI_NameCardPic_Ly2_P","210051":"UI_NameCardPic_Tzz3_P","210052":"UI_NameCardPic_Xssdlk_P","210053":"UI_NameCardPic_Ganyu_P","210054":"UI_NameCardPic_Albedo_P","210055":"UI_NameCardPic_Bp3_P","210056":"UI_NameCardPic_ElderTree_P","210057":"UI_NameCardPic_EffigyChallenge_P","210058":"UI_NameCardPic_Xiao_P","210059":"UI_NameCardPic_Hutao_P","210060":"UI_NameCardPic_Bp4_P","210061":"UI_NameCardPic_LanternRite_P","210062":"UI_NameCardPic_TheatreMechanicus_P","210063":"UI_NameCardPic_Rosaria_P","210064":"UI_NameCardPic_Bp5_P","210065":"UI_NameCardPic_RedandWhite_P","210066":"UI_NameCardPic_Razer_P","210067":"UI_NameCardPic_ChannellerSlab_P","210068":"UI_NameCardPic_HideandSeek_P","210069":"UI_NameCardPic_Feiyan_P","210070":"UI_NameCardPic_Eula_P","210071":"UI_NameCardPic_Bp6_P","210072":"UI_NameCardPic_Homeworld_P","210073":"UI_NameCardPic_Kazuha_P","210074":"UI_NameCardPic_Bp7_P","210075":"UI_NameCardPic_Homeworld1_P","210076":"UI_NameCardPic_Google_P","210077":"UI_NameCardPic_BounceConjuringChallenge_P","210078":"UI_NameCardPic_EffigyChallenge02_P","210079":"UI_NameCardPic_Oraionokami_P","210080":"UI_NameCardPic_Bp8_P","210081":"UI_NameCardPic_Ayaka_P","210082":"UI_NameCardPic_Yoimiya_P","210083":"UI_NameCardPic_Sayu_P","210084":"UI_NameCardPic_Dq1_P","210085":"UI_NameCardPic_Dq2_P","210086":"UI_NameCardPic_Ysxf2_P","210087":"UI_NameCardPic_Csxy2_P","210088":"UI_NameCardPic_Tzz4_P","210089":"UI_NameCardPic_Homeworld2_P","210090":"UI_NameCardPic_Daoqi1_P","210091":"UI_NameCardPic_TheatreMechanicus2_P","210092":"UI_NameCardPic_Shougun_P","210093":"UI_NameCardPic_Kokomi_P","210094":"UI_NameCardPic_Sara_P","210095":"UI_NameCardPic_Aloy_P","210096":"UI_NameCardPic_Bp9_P","210097":"UI_NameCardPic_Daoqi2_P","210098":"UI_NameCardPic_Fishing_P","210099":"UI_NameCardPic_Concert_P","210100":"UI_NameCardPic_Sumo_P","210101":"UI_NameCardPic_Tohma_P","210102":"UI_NameCardPic_Bp10_P","210103":"UI_NameCardPic_Daoqi3_P","210104":"UI_NameCardPic_Gorou_P","210105":"UI_NameCardPic_Itto_P","210106":"UI_NameCardPic_Bp11_P","210107":"UI_NameCardPic_Shenhe_P","210108":"UI_NameCardPic_Yunjin_P","210109":"UI_NameCardPic_Daoqi4_P","210110":"UI_NameCardPic_Bp12_P","210111":"UI_NameCardPic_Bartender_P","210112":"UI_NameCardPic_Yae1_P","210113":"UI_NameCardPic_Bp13_P","210114":"UI_NameCardPic_Ayato_P","210115":"UI_NameCardPic_LuminanceStone_P","210116":"UI_NameCardPic_Tzz5_P","210117":"UI_NameCardPic_Cenyan1_P","210118":"UI_NameCardPic_Bp14_P","210119":"UI_NameCardPic_Yelan_P","210120":"UI_NameCardPic_Shinobu_P","210121":"UI_NameCardPic_Bp15_P","210122":"UI_NameCardPic_Heizo_P","210123":"UI_NameCardPic_Bp16_P","210124":"UI_NameCardPic_Tighnari_P","210125":"UI_NameCardPic_Collei_P","210126":"UI_NameCardPic_Dori_P","210127":"UI_NameCardPic_Bp17_P","210128":"UI_NameCardPic_Csxy3_P","210129":"UI_NameCardPic_Ysxf3_P","210130":"UI_NameCardPic_Xm1_P","210131":"UI_NameCardPic_Xumi1_P","210132":"UI_NameCardPic_Xumi2_P","210133":"UI_NameCardPic_Bp18_P","210134":"UI_NameCardPic_Cyno_P","210135":"UI_NameCardPic_Candace_P","210136":"UI_NameCardPic_Nilou_P","210137":"UI_NameCardPic_Yszj2_P","210138":"UI_NameCardPic_Xm2_P","210139":"UI_NameCardPic_Tzz6_P","210140":"UI_NameCardPic_Nahida_P","210141":"UI_NameCardPic_Layla_P","210142":"UI_NameCardPic_Bp19_P","210143":"UI_NameCardPic_Wanderer_P","210144":"UI_NameCardPic_Faruzan_P","210145":"UI_NameCardPic_Gcg1_P","210146":"UI_NameCardPic_Bp20_P","210147":"UI_NameCardPic_Alhatham_P","210148":"UI_NameCardPic_Yaoyao_P","210149":"UI_NameCardPic_Cadillac_P","210150":"UI_NameCardPic_Bp21_P","210151":"UI_NameCardPic_Xm3_P","210152":"UI_NameCardPic_Dehya_P","210153":"UI_NameCardPic_Mika_P","210154":"UI_NameCardPic_Bp22_P","210155":"UI_NameCardPic_Baizhuer_P","210156":"UI_NameCardPic_Kaveh_P","210157":"UI_NameCardPic_Xm4_P","210158":"UI_NameCardPic_Tzz7_P","210159":"UI_NameCardPic_Vasara_P","210160":"UI_NameCardPic_OfferingPari_P","210161":"UI_NameCardPic_Bp23_P","210162":"UI_NameCardPic_Kirara_P","210163":"UI_NameCardPic_Bp24_P","210164":"UI_NameCardPic_Bp25_P","210165":"UI_NameCardPic_Liney_P","210166":"UI_NameCardPic_Linette_P","210167":"UI_NameCardPic_Freminet_P","210168":"UI_NameCardPic_FD1_P","210169":"UI_NameCardPic_Ysxf4_P","210170":"UI_NameCardPic_Csxy4_P","210171":"UI_NameCardPic_Fontaine1_P","210172":"UI_NameCardPic_Fontaine2_P","210173":"UI_NameCardPic_Bp26_P","210174":"UI_NameCardPic_Neuvillette_P","210175":"UI_NameCardPic_Wriothesley_P","210176":"UI_NameCardPic_Bp27_P","210177":"UI_NameCardPic_Guqin_P","210178":"UI_NameCardPic_Tzz8_P","210179":"UI_NameCardPic_FD2_P","210180":"UI_NameCardPic_Furina_P","210181":"UI_NameCardPic_Charlotte_P","210182":"UI_NameCardPic_FD3_P","210183":"UI_NameCardPic_Bp28_P","210184":"UI_NameCardPic_Navia_P","210185":"UI_NameCardPic_Chevreuse_P","210186":"UI_NameCardPic_Bp29_P","210187":"UI_NameCardPic_Liuyun_P","210188":"UI_NameCardPic_Gaming_P","210189":"UI_NameCardPic_Chenyu1_P","210190":"UI_NameCardPic_OfferingSilong_P","210191":"UI_NameCardPic_Bp30_P","210192":"UI_NameCardPic_OST4_P","210193":"UI_NameCardPic_Chiori_P","210194":"UI_NameCardPic_Bp31_P","210195":"UI_NameCardPic_Arlecchino_P","210196":"UI_NameCardPic_Deep_P","210197":"UI_NameCardPic_Tzz9_P","210198":"UI_NameCardPic_WishingPond_P","210199":"UI_NameCardPic_GreatFestivalV2_P","210200":"UI_NameCardPic_Clorinde_P","210201":"UI_NameCardPic_Sigewinne_P","210202":"UI_NameCardPic_Sethos_P","210203":"UI_NameCardPic_RoleCombat_P","210204":"UI_NameCardPic_Bp33_P","210205":"UI_NameCardPic_Emilie_P","210206":"UI_NameCardPic_Bp34_P","210207":"UI_NameCardPic_RedandWhite2_P","210208":"UI_NameCardPic_Kinich_P","210209":"UI_NameCardPic_Mualani_P","210210":"UI_NameCardPic_Kachina_P","210211":"UI_NameCardPic_NatlanSW1_P","210212":"UI_NameCardPic_NatlanSW2_P","210213":"UI_NameCardPic_Ysxf5_P","210214":"UI_NameCardPic_RoleCombat2_P","210215":"UI_NameCardPic_Natlan1_P","210216":"UI_NameCardPic_Dfcq1_P","210217":"UI_NameCardPic_Bp35_P","210218":"UI_NameCardPic_Yellow_P","210219":"UI_NameCardPic_Xilonen_P","210220":"UI_NameCardPic_Bp36_P","210221":"UI_NameCardPic_Chasca_P","210222":"UI_NameCardPic_Olorun_P","210223":"UI_NameCardPic_Natlan2_P","210224":"UI_NameCardPic_Dfcq2_P","210225":"UI_NameCardPic_Bp37_P","210226":"UI_NameCardPic_Mavuika_P","210227":"UI_NameCardPic_Citlali_P","210228":"UI_NameCardPic_Lanyan_P","210229":"UI_NameCardPic_Csxy5_P","210230":"UI_NameCardPic_Tzz10_P","210231":"UI_NameCardPic_MusicGame01_P","210232":"UI_NameCardPic_Bp38_P","210233":"UI_NameCardPic_Mizuki_P","210234":"UI_NameCardPic_TowerChallenge_P","210235":"UI_NameCardPic_Bp39_P","210236":"UI_NameCardPic_Varesa_P","210237":"UI_NameCardPic_Iansan_P","210238":"UI_NameCardPic_Natlan3_P","210239":"UI_NameCardPic_Dfcq3_P","210240":"UI_NameCardPic_Bp40_P","210241":"UI_NameCardPic_Escoffier_P","210242":"UI_NameCardPic_Ifa_P","210243":"UI_NameCardPic_Bp41_P","210244":"UI_NameCardPic_SkirkNew_P","210245":"UI_NameCardPic_Dahlia_P","210246":"UI_NameCardPic_RedandWhite3_P","210247":"UI_NameCardPic_Bp42_P","210248":"UI_NameCardPic_Ineffa_P","210249":"UI_NameCardPic_NatlanOffering_P","210250":"UI_NameCardPic_Natlan4_P","210251":"UI_NameCardPic_Bp43_P","210252":"UI_NameCardPic_Event58_P","210253":"UI_NameCardPic_Lauma_P","210254":"UI_NameCardPic_Flins_P","210255":"UI_NameCardPic_Aino_P","210256":"UI_NameCardPic_NodKraiOffering1_P","210257":"UI_NameCardPic_NodKrai1_P","210258":"UI_NameCardPic_Ysxf6_P","210259":"UI_NameCardPic_Bp44_P","210260":"UI_NameCardPic_YellowV2_P","210261":"UI_NameCardPic_Nefer_P","210262":"UI_NameCardPic_Bp45_P","210263":"UI_NameCardPic_Durin_P","210264":"UI_NameCardPic_Jahoda_P","210265":"UI_NameCardPic_Bp46_P","210266":"UI_NameCardPic_Green_P"};
 const DEFAULT_NAMECARD_ICON = "UI_NameCardPic_0_P";
 const ENKA_UI_BASE = "https://enka.network/ui/";
-const ENKA_API_BASE = "https://enka.network/api/uid/";
+const ENKA_API_BASE = "/api/uid/";
 
 const CATEGORY = {
-  spiral: { label: "JOKI SPIRAL", sub: "Spiral Abyss", varName: "--spiral" },
-  so:     { label: "JOKI SO",     sub: "Stygian Onslaught", varName: "--so" },
-  it:     { label: "JOKI IT",     sub: "Imaginarium Theater", varName: "--it" },
+  spiral: { label: "SPIRAL", sub: "Spiral Abyss", varName: "--spiral" },
+  so:     { label: "SO",     sub: "Stygian Onslaught", varName: "--so" },
+  it:     { label: "IT",     sub: "Imaginarium Theater", varName: "--it" },
+  gacha:  { label: "GACHA",  sub: "Character / Weapon", varName: "--gilt" },
 };
 
-let currentCategory = "spiral";
+let selectedCategories = [];
 
 const els = {
   form: document.getElementById("card-form"),
+  jokiName: document.getElementById("joki-name"),
   uid: document.getElementById("uid"),
+  gachaField: document.getElementById("gacha-field"),
+  gachaTarget: document.getElementById("gacha-target"),
   segGroup: document.getElementById("category-group"),
   submitBtn: document.getElementById("submit-btn"),
   resetBtn: document.getElementById("reset-btn"),
@@ -349,18 +385,31 @@ const els = {
   uidDisplay: document.getElementById("uid-display"),
   liveDot: document.getElementById("live-dot"),
   liveLabel: document.getElementById("live-label"),
+  jokiNameDisplay: document.getElementById("joki-name-display"),
 };
 
 els.segGroup.addEventListener("click", (e) => {
   const btn = e.target.closest(".seg-btn");
   if (!btn) return;
-  currentCategory = btn.dataset.cat;
-  [...els.segGroup.children].forEach((b) => {
-    const on = b === btn;
-    b.setAttribute("aria-pressed", on);
-    b.setAttribute("aria-checked", on);
-  });
+
+  const category = btn.dataset.cat;
+  const isSelected = btn.getAttribute("aria-pressed") === "true";
+
+  if (isSelected) {
+    selectedCategories = selectedCategories.filter((cat) => cat !== category);
+  } else {
+    selectedCategories.push(category);
+  }
+
+  btn.setAttribute("aria-pressed", String(!isSelected));
+  updateGachaField();
 });
+
+function updateGachaField() {
+  const hasGacha = selectedCategories.includes("gacha");
+  els.gachaField.classList.toggle("show", hasGacha);
+  if (!hasGacha) els.gachaTarget.value = "";
+}
 
 els.form.addEventListener("submit", (e) => {
   e.preventDefault();
@@ -368,7 +417,12 @@ els.form.addEventListener("submit", (e) => {
 });
 
 els.resetBtn.addEventListener("click", () => {
+  els.jokiName.value = "";
   els.uid.value = "";
+  els.gachaTarget.value = "";
+  selectedCategories = [];
+  [...els.segGroup.children].forEach((btn) => btn.setAttribute("aria-pressed", "false"));
+  updateGachaField();
   setStatus("", null);
   showEmptyState();
   els.resetBtn.hidden = true;
@@ -387,12 +441,32 @@ function showEmptyState() {
   els.cardFrame.style.display = "none";
   els.ribbon.style.display = "none";
   els.cardFoot.style.display = "none";
+  els.jokiNameDisplay.textContent = "";
   els.liveDot.classList.remove("on");
   els.liveLabel.textContent = "Menunggu Akun";
 }
 
 async function handleSubmit() {
+  const jokiName = els.jokiName.value.trim();
   const rawUid = els.uid.value.trim();
+
+  if (!jokiName) {
+    setStatus("Nama joki wajib diisi.", "error");
+    els.jokiName.focus();
+    return;
+  }
+
+  if (selectedCategories.length === 0) {
+    setStatus("Pilih minimal satu jenis joki.", "error");
+    return;
+  }
+
+  if (selectedCategories.includes("gacha") && !els.gachaTarget.value.trim()) {
+    setStatus("Isi nama karakter / weapon yang akan digacha.", "error");
+    els.gachaTarget.focus();
+    return;
+  }
+
   if (!/^\d{6,10}$/.test(rawUid)) {
     setStatus("Format UID tidak valid. UID Genshin biasanya 6–10 digit angka.", "error");
     return;
@@ -418,7 +492,7 @@ async function handleSubmit() {
       return;
     }
 
-    renderCard(info, rawUid, currentCategory);
+    renderCard(info, rawUid, jokiName, selectedCategories);
     setStatus(`Berhasil dimuat: ${info.nickname ?? "Traveler"}.`, "ok");
     els.resetBtn.hidden = false;
   } catch (err) {
@@ -440,7 +514,7 @@ function mapHttpError(status) {
   }
 }
 
-function renderCard(info, uid, categoryKey) {
+function renderCard(info, uid, jokiName, categoryKeys) {
   const nickname = info.nickname || "Traveler";
   const ar = info.level;
   const nameCardId = String(info.nameCardId ?? info.namecardId ?? "");
@@ -458,10 +532,22 @@ function renderCard(info, uid, categoryKey) {
   els.cardScrim.style.display = "block";
   els.cardFrame.style.display = "block";
 
-  const cat = CATEGORY[categoryKey] || CATEGORY.spiral;
+  const cats = categoryKeys.map((key) => CATEGORY[key]).filter(Boolean);
+  const hasGacha = categoryKeys.includes("gacha");
   els.ribbon.style.display = "block";
-  els.ribbon.style.background = `var(${cat.varName})`;
-  els.ribbon.innerHTML = `${cat.label}<small>${cat.sub}</small>`;
+
+  if (cats.length === 1) {
+    const cat = cats[0];
+    els.ribbon.style.background = `var(${cat.varName})`;
+    els.ribbon.innerHTML = `${cat.label}<small>${cat.sub}</small>`;
+  } else {
+    els.ribbon.style.background = "var(--gilt)";
+    els.ribbon.innerHTML = `JOKI AKTIF<small>${cats.map((cat) => cat.label).join(" · ")}</small>`;
+  }
+
+  if (hasGacha && els.gachaTarget.value.trim()) {
+    els.ribbon.innerHTML += `<small style="margin-top:4px;opacity:0.9;">Target: ${escapeHtml(els.gachaTarget.value.trim())}</small>`;
+  }
 
   els.avatarRing.innerHTML = "";
   if (avatarIcon) {
@@ -476,12 +562,22 @@ function renderCard(info, uid, categoryKey) {
 
   els.nickname.textContent = nickname;
   els.nickname.title = nickname;
+  els.jokiNameDisplay.textContent = `Joki: ${jokiName}`;
   els.arBadge.textContent = ar != null ? `AR ${ar}` : "";
   els.uidDisplay.textContent = `UID ${uid}`;
   els.cardFoot.style.display = "flex";
 
   els.liveDot.classList.add("on");
   els.liveLabel.textContent = "Sedang Dikerjakan";
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
 
 function fallbackAvatarHtml(nickname) {
