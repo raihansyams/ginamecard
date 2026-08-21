@@ -341,7 +341,6 @@
             <div class="corner br"><svg viewBox="0 0 20 20"><path d="M1 1 H14 M1 1 V14" stroke="#ecca8c" stroke-width="1.5" fill="none"/></svg></div>
           </div>
           <div class="identity-row">
-            <div class="avatar-ring" id="avatar-ring"></div>
             <div class="name-block">
               <p class="taco-name" id="taco-name-display"></p>
               <p class="ingame-name" id="ingame-name-display"></p>
@@ -396,7 +395,6 @@ const els = {
   ncBanner: document.getElementById("nc-banner"),
   ncFooter: document.getElementById("nc-footer"),
   cardBg: document.getElementById("card-bg"),
-  avatarRing: document.getElementById("avatar-ring"),
   tacoNameDisplay: document.getElementById("taco-name-display"),
   ingameNameDisplay: document.getElementById("ingame-name-display"),
   arUidDisplay: document.getElementById("ar-uid-display"),
@@ -587,17 +585,6 @@ function renderCard(info, uid, tacoName, keteranganList) {
 
   els.cardBg.style.backgroundImage = `url("${bgUrl}")`;
   requestAnimationFrame(() => els.cardBg.classList.add("show"));
-
-  els.avatarRing.innerHTML = "";
-  if (avatarIcon) {
-    const img = document.createElement("img");
-    img.src = ENKA_UI_BASE + avatarIcon + ".png";
-    img.alt = nickname;
-    img.onerror = () => { els.avatarRing.innerHTML = fallbackAvatarHtml(nickname); };
-    els.avatarRing.appendChild(img);
-  } else {
-    els.avatarRing.innerHTML = fallbackAvatarHtml(nickname);
-  }
 
   els.tacoNameDisplay.textContent = tacoName;
   els.tacoNameDisplay.title = tacoName;
